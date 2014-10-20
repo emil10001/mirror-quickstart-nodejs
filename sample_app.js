@@ -297,12 +297,20 @@ app.post('/', function(req, res) {
     res.end();
 });
 app.post('/notify', function (req, res) {
-    console.log('notified',req);
-i});
+    console.log('post notified',req);
+});
 
 app.get('/notify', function (req, res) {
-    console.log('notified',req);
+    console.log('get notified',req);
 });
+
+function tryRender(params, asyncRequests, res) {
+    if (!!asyncRequests.timeline_items && !!asyncRequests.subscriptions) {
+        console.log("render", params);
+        res.render('index',params); 
+        res.end();
+    }
+}
 
 app.get('/', function(req, res){
     var cookies = new Cookies( req, res, keys );
@@ -322,26 +330,53 @@ app.get('/', function(req, res){
         return;
     }
 
+    var params = {
+        timeline_items: [],
+        timeline_subscription: {},
+        location_subscription: {},
+        appbase_url: 'https://' + req.get('host'),
+        contact_id: "3rn2-rnoi2",
+        contact_name: "Herbert Shoe"
+    };
+
+    var asyncRequests = {
+        timeline_items: false,
+        subscriptions: false
+    };
+
     new TimelineHelper(oauth2Client, client).listTimeline(function(err){
-        console.log("couldn't get timeline items");
-        res.render('index', {
-            timeline_items: [],
-            timeline_subscription: {},
-            location_subscription: {},
-            appbase_url: req.protocol + '://' + req.get('host'),
-            contact_id: "3rn2-rnoi2",
-            contact_name: "Herbert Shoe"
-        });
+        console.log("couldn't get timeline items", err);
+	asyncRequests.timeline_items = true;
+	asyncRequests.subscriptions = true;
+	tryRender(params, asyncRequests, res);
     }, function(timelineItems){
-        res.render('index', {
-            timeline_items: timelineItems,
-            timeline_subscription: {},
-            location_subscription: {},
-            appbase_url: req.protocol + '://' + req.get('host'),
-            contact_id: "3rn2-rnoi2",
-            contact_name: "Herbert Shoe"
+	params.timeline_items = timelineItems.items;
+        console.log("got timeline items");
+	asyncRequests.timeline_items = true;
+    	client
+       	 .mirror.subscriptions.list()
+       	 .withAuthClient(oauth2Client)
+       	 .execute(function (err, data) {
+            if (!!err) {
+                console.log("couldn't get subscriptions", err);
+	        asyncRequests.subscriptions = true;
+	        tryRender(params, asyncRequests, res);
+            } else {
+	        if (!!data && !!data.items) {
+                    for (var i=0; i<data.items.length; i++){
+                        if ("timeline" === data.items[i].collection)
+                            params.timeline_subscription = data.items[i]
+                        else if ("location" === data.items[i].collection)
+                            params.location_subscription = data.items[i]
+                    }
+                }
+                console.log("got subscriptions", params.timeline_subscription, params.location_subscription);
+	        asyncRequests.subscriptions = true;
+	        tryRender(params, asyncRequests, res);
+	    }
         });
     });
+
 
 });
 app.get('/install', function(req, res) {

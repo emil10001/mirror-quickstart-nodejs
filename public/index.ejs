@@ -42,8 +42,10 @@ limitations under the License.
 
                 <div style="margin-top: 5px;">
 
-                    <% if (!!timeline_items && !!timeline_items.items && timeline_items.items !== []) { %>
-                    <% timeline_items.items.map( function(timelineItem) { %>
+                    <% if (!!timeline_items && timeline_items !== []) { %>
+                    <% for (var i = 0; i < timeline_items.length; i++) { %>
+                    <% 	   if (i >= 3) break; %>
+                    <%     var timelineItem = timeline_items[i]; %>
                     <div class="span4">
                         <table class="table table-bordered">
                             <tbody>
@@ -84,7 +86,7 @@ limitations under the License.
                             </tbody>
                         </table>
                     </div>
-                    <% }); %>
+                    <% } %>
                     <% } else { %>
                     <div class="span12">
                         <div class="alert alert-info">
