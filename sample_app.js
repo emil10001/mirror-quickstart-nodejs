@@ -19,7 +19,7 @@ var express = require('express'),
 app.set('port', 8444);
 app.use(express.static(__dirname + '/public'));
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use( bodyParser.urlencoded() ); // to support URL-encoded bodies
+app.use( bodyParser.urlencoded({ extended: false }) ); // to support URL-encoded bodies
 
 // Without this you would need to
 // supply the extension to res.render()
@@ -203,11 +203,54 @@ function deleteContact(userId, req, res) {
 }
 
 function deleteSubscription(userId, req, res) {
-    console.log("try again when you get this onto a server");
+    var subscriptionId = req.body.subscriptionId;
+
+    var client = clientManager.get(userId).client,
+        oauth2Client = clientManager.get(userId).oauth2Client;
+
+    if (!!!client || !!!oauth2Client) {
+        failure("no client or no oauth2Client");
+        return;
+    }
+    console.log('attempting to delete subscription',subscriptionId);
+
+    client
+        .mirror.subscriptions.delete({'id': subscriptionId})
+        .withAuthClient(oauth2Client)
+        .execute(function (err, data) {
+            if (!!err)
+                failure(err);
+            else
+                success(data);
+        });
 }
 
 function insertSubscription(userId, req, res) {
-    console.log("try again when you get this onto a server");
+    var subscriptionId = req.body.collection;
+
+    var subscription = new mirror.Subscription()
+    	.collection(subscriptionId)
+        .callbackUrl('https://' + req.get('host') + '/notify')
+        .operation(['UPDATE','INSERT','DELETE']);  
+
+    var client = clientManager.get(userId).client,
+        oauth2Client = clientManager.get(userId).oauth2Client;
+
+    if (!!!client || !!!oauth2Client) {
+        failure("no client or no oauth2Client");
+        return;
+    }
+    console.log('attempting to insert subscription',subscription.build());
+
+    client
+        .mirror.subscriptions.insert(subscription.build())
+        .withAuthClient(oauth2Client)
+        .execute(function (err, data) {
+            if (!!err)
+                failure(err);
+            else
+                success(data);
+        });
 }
 
 app.post('/', function(req, res) {
@@ -253,6 +296,14 @@ app.post('/', function(req, res) {
     res.redirect('/');
     res.end();
 });
+app.post('/notify', function (req, res) {
+    console.log('notified',req);
+i});
+
+app.get('/notify', function (req, res) {
+    console.log('notified',req);
+});
+
 app.get('/', function(req, res){
     var cookies = new Cookies( req, res, keys );
     var userId = cookies.get("user_id");
@@ -277,21 +328,19 @@ app.get('/', function(req, res){
             timeline_items: [],
             timeline_subscription: {},
             location_subscription: {},
-            appbase_url: req.url,
+            appbase_url: req.protocol + '://' + req.get('host'),
             contact_id: "3rn2-rnoi2",
             contact_name: "Herbert Shoe"
         });
-//        res.end();
     }, function(timelineItems){
         res.render('index', {
             timeline_items: timelineItems,
             timeline_subscription: {},
             location_subscription: {},
-            appbase_url: req.url,
+            appbase_url: req.protocol + '://' + req.get('host'),
             contact_id: "3rn2-rnoi2",
             contact_name: "Herbert Shoe"
         });
-//        res.end();
     });
 
 });
