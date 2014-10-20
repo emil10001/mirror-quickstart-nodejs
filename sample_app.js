@@ -26,6 +26,8 @@ app.use( bodyParser.urlencoded() ); // to support URL-encoded bodies
 // ex: res.render('users.ejs').
 app.set('view engine', 'ejs');
 
+app.set('views', __dirname + '/public');
+
 function failure (data) {
     console.log('falure',data);
 }
@@ -271,7 +273,7 @@ app.get('/', function(req, res){
 
     new TimelineHelper(oauth2Client, client).listTimeline(function(err){
         console.log("couldn't get timeline items");
-        res.render('public/index', {
+        res.render('index', {
             timeline_items: [],
             timeline_subscription: {},
             location_subscription: {},
@@ -279,9 +281,9 @@ app.get('/', function(req, res){
             contact_id: "3rn2-rnoi2",
             contact_name: "Herbert Shoe"
         });
-        res.end();
+//        res.end();
     }, function(timelineItems){
-        res.render('public/index', {
+        res.render('index', {
             timeline_items: timelineItems,
             timeline_subscription: {},
             location_subscription: {},
@@ -289,7 +291,7 @@ app.get('/', function(req, res){
             contact_id: "3rn2-rnoi2",
             contact_name: "Herbert Shoe"
         });
-        res.end();
+//        res.end();
     });
 
 });
@@ -311,7 +313,7 @@ app.get('/oauth2callback', function(req, res){
         console.log('failure',data);
         res.end();
     }, function(oauth2Client, client, profile) {
-        console.log('success',oauth2Client, client, profile.id, profile.displayName);
+//        console.log('success',oauth2Client, client, profile.id, profile.displayName);
 
         // save user info in the client manager (not included in library!)
         clientManager.add(profile, oauth2Client, client);
