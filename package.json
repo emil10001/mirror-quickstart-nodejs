@@ -1,5 +1,5 @@
 {
-    "name": "mirror quick start",
+    "name": "mirror_quick_start",
     "version": "1.0.0",
     "description": "Mirror QuickStart for Node.js",
     "main": "app.js",
