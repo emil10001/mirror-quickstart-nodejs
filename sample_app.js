@@ -16,12 +16,15 @@ var express = require('express'),
     bodyParser = require('body-parser');
 
 
-var index = fs.readFileSync(__dirname + '/public/index.ejs', 'utf8');
-
 app.set('port', 8444);
 app.use(express.static(__dirname + '/public'));
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use( bodyParser.urlencoded() ); // to support URL-encoded bodies
+
+// Without this you would need to
+// supply the extension to res.render()
+// ex: res.render('users.ejs').
+app.set('view engine', 'ejs');
 
 function failure (data) {
     console.log('falure',data);
@@ -268,24 +271,24 @@ app.get('/', function(req, res){
 
     new TimelineHelper(oauth2Client, client).listTimeline(function(err){
         console.log("couldn't get timeline items");
-        res.write(ejs.render(index, {
+        res.render('public/index', {
             timeline_items: [],
             timeline_subscription: {},
             location_subscription: {},
             appbase_url: req.url,
             contact_id: "3rn2-rnoi2",
             contact_name: "Herbert Shoe"
-        }));
+        });
         res.end();
     }, function(timelineItems){
-        res.write(ejs.render(index, {
+        res.render('public/index', {
             timeline_items: timelineItems,
             timeline_subscription: {},
             location_subscription: {},
             appbase_url: req.url,
             contact_id: "3rn2-rnoi2",
             contact_name: "Herbert Shoe"
-        }));
+        });
         res.end();
     });
 
