@@ -5,17 +5,19 @@
 ClientManager = function () {
     var clientMap = {};
 
-    this.add = function(profile, oauth2Client, client) {
-        clientMap[profile.id] = {"oauth2Client": oauth2Client,
-                                 "client": client,
-                                 "profile": profile};
+    this.add = function (profile, oauth2Client, mirror) {
+        clientMap[profile.id] = {
+            oauth2Client: oauth2Client,
+            mirror: mirror,
+            profile: profile
+        };
     };
 
-    this.users = function(){
+    this.users = function () {
         return clientMap;
     };
 
-    this.get = function(id) {
+    this.get = function (id) {
         return clientMap[id];
     };
 
