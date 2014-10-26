@@ -42,7 +42,7 @@ limitations under the License.
 
                 <div style="margin-top: 5px;">
 
-                    <% if (!!timeline_items && timeline_items !== []) { %>
+                    <% if (!!timeline_items && timeline_items.length > 0) { %>
                     <% for (var i = 0; i < timeline_items.length; i++) { %>
                     <% 	   if (i >= 3) break; %>
                     <%     var timelineItem = timeline_items[i]; %>
@@ -157,7 +157,7 @@ limitations under the License.
                         all content types. Learn more about contacts
                         <a href="https://developers.google.com/glass/contacts">here</a>.</p>
 
-                    <% if (contact_id !== null) { %>
+                    <% if (contact_id === null || (0 === Object.keys(contact_id).length)) { %>
                     <form action="/" method="post">
                     <input type="hidden" name="operation" value="insertContact">
                     <input type="hidden" name="iconUrl" value="/static/images/chipotle-tube-640x360.jpg">
@@ -170,7 +170,7 @@ limitations under the License.
                     <% } else { %>
                     <form action="/" method="post">
                     <input type="hidden" name="operation" value="deleteContact">
-                    <input type="hidden" name="id" value="<%= contact_id %>">
+                    <input type="hidden" name="id" value="3rn2-rnoi2"> <!-- using hardcoded value -->
                     <button class="btn btn-block btn-danger" type="submit">
                         Delete Java Quick Start Contact
                     </button>
@@ -196,7 +196,7 @@ limitations under the License.
                     <p class="alert alert-info">Note: Subscriptions require SSL. They will
                         not work on localhost.</p>
 
-                    <% if (!!timeline_subscription && timeline_subscription !== {}) { %>
+                    <% if (!!timeline_subscription && (0 !== Object.keys(timeline_subscription).length) ) { %>
                     <form action="/" method="post">
                     <input type="hidden" name="subscriptionId" value="timeline">
                     <input type="hidden" name="operation" value="deleteSubscription">
@@ -214,7 +214,7 @@ limitations under the License.
                     </form>
                     <% } %>
 
-                    <% if (!!location_subscription && location_subscription !== {}) { %>
+                    <% if (!!location_subscription && (0 !== Object.keys(location_subscription).length) ) { %>
                     <form action="/"
                     method="post">
                     <input type="hidden" name="subscriptionId" value="locations">
