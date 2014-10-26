@@ -48,7 +48,7 @@ var PAGINATED_HTML =
     + "</article>";
 
 function insertCard(userId, card) {
-    var client = clientManager.get(userId).client,
+    var client = clientManager.get(userId).mirror,
         oauth2Client = clientManager.get(userId).oauth2Client;
 
     if (!!!client || !!!oauth2Client) {
@@ -90,7 +90,7 @@ function insertItem(userId, req, res) {
 function deleteTimelineItem(userId, req, res) {
     var itemId = req.body.itemId;
 
-    var client = clientManager.get(userId).client,
+    var client = clientManager.get(userId).mirror,
         oauth2Client = clientManager.get(userId).oauth2Client;
 
     if (!!!client || !!!oauth2Client) {
@@ -160,7 +160,7 @@ function insertContact(userId, req, res) {
     var contact = new mirror.Contacts()
         .buildContact(contactId, name, iconUrl);
 
-    var client = clientManager.get(userId).client,
+    var client = clientManager.get(userId).mirror,
         oauth2Client = clientManager.get(userId).oauth2Client;
 
     if (!!!client || !!!oauth2Client) {
@@ -182,7 +182,7 @@ function insertContact(userId, req, res) {
 function deleteContact(userId, req, res) {
     var contactId = req.body.id;
 
-    var client = clientManager.get(userId).client,
+    var client = clientManager.get(userId).mirror,
         oauth2Client = clientManager.get(userId).oauth2Client;
 
     if (!!!client || !!!oauth2Client) {
@@ -207,7 +207,7 @@ function deleteContact(userId, req, res) {
 function deleteSubscription(userId, req, res) {
     var subscriptionId = req.body.subscriptionId;
 
-    var client = clientManager.get(userId).client,
+    var client = clientManager.get(userId).mirror,
         oauth2Client = clientManager.get(userId).oauth2Client;
 
     if (!!!client || !!!oauth2Client) {
@@ -236,7 +236,7 @@ function insertSubscription(userId, req, res) {
         .callbackUrl('https://' + req.get('host') + '/notify')
         .operation(['UPDATE', 'INSERT', 'DELETE']);
 
-    var client = clientManager.get(userId).client,
+    var client = clientManager.get(userId).mirror,
         oauth2Client = clientManager.get(userId).oauth2Client;
 
     if (!!!client || !!!oauth2Client) {

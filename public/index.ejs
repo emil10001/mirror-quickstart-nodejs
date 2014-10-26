@@ -157,7 +157,7 @@ limitations under the License.
                         all content types. Learn more about contacts
                         <a href="https://developers.google.com/glass/contacts">here</a>.</p>
 
-                    <% if (contact_id === null || (0 === Object.keys(contact_id).length)) { %>
+                    <% if (contact_id === null || !!!contact_id) { %>
                     <form action="/" method="post">
                     <input type="hidden" name="operation" value="insertContact">
                     <input type="hidden" name="iconUrl" value="/static/images/chipotle-tube-640x360.jpg">
