@@ -190,8 +190,7 @@ function deleteContact(userId, req, res) {
         return;
     }
 
-    client
-        .mirror.contacts.delete({
+    client.contacts.delete({
             id: contactId,
             auth: oauth2Client
         },
