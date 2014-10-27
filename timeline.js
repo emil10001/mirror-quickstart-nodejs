@@ -41,7 +41,7 @@ TimelineHelper = function (oauth2Client, mirror) {
                 attachment['itemId'] = card.resource.id;
 
                 var media = attachment;
-                media['body'] =  fs.createReadStream('public/' + attachment.contentUrl);
+                media['body'] =  attachment.contentUrl; //fs.createReadStream('public/' + attachment.contentUrl);
                 media['mimeType'] = attachment.contentType;
 
                 var wrapper = {
