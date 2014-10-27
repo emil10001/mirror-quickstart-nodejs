@@ -253,6 +253,11 @@ function insertSubscription(userId, req, res) {
         .collection(collection)
         .callbackUrl('https://' + req.get('host') + '/notify');
 
+    if ('locations' === collection) {
+        subscription.operation(['UPDATE'])
+            .itemId('latest');
+    }
+
     var oauth2Client = clientManager.get(userId).oauth2Client;
 
     if (!!!oauth2Client) {
