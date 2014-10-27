@@ -56,6 +56,10 @@ function insertCard(userId, card) {
         return;
     }
 
+    console.log('inserting card',card);
+    if (!!card.resource.attachments)
+        console.log('attachments',card.resource.attachments);
+
     new TimelineHelper(oauth2Client, mirrorClient).insert(card, failure, success);
 }
 
@@ -313,12 +317,13 @@ app.post('/', function (req, res) {
     res.redirect('/');
     res.end();
 });
+
 app.post('/notify', function (req, res) {
-    console.log('post notified', req);
+    console.log('post notified', req.body);
 });
 
 app.get('/notify', function (req, res) {
-    console.log('get notified', req);
+    console.log('get notified', req.body);
 });
 
 function tryRender(params, asyncRequests, res) {
