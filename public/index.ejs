@@ -161,7 +161,7 @@ limitations under the License.
                     <form action="/" method="post">
                     <input type="hidden" name="operation" value="insertContact">
                     <input type="hidden" name="iconUrl" value="/static/images/chipotle-tube-640x360.jpg">
-                    <input type="hidden" name="id" value="<%= contact_id %>">
+                    <input type="hidden" name="id" value="3rn2-rnoi2">
                     <input type="hidden" name="name" value="<%= contact_name %>">
                     <button class="btn btn-block btn-success" type="submit">
                         Insert Java Quick Start Contact
@@ -170,7 +170,7 @@ limitations under the License.
                     <% } else { %>
                     <form action="/" method="post">
                     <input type="hidden" name="operation" value="deleteContact">
-                    <input type="hidden" name="id" value="3rn2-rnoi2"> <!-- using hardcoded value -->
+                    <input type="hidden" name="id" value="<%= contact_id %>"> <!-- using hardcoded value -->
                     <button class="btn btn-block btn-danger" type="submit">
                         Delete Java Quick Start Contact
                     </button>

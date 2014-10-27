@@ -13,7 +13,8 @@ var express = require('express'),
 // https://github.com/expressjs/keygrip
     Keygrip = require("keygrip"),
     keys = Keygrip(["SEKRIT2", "SEKRIT1"]),
-    bodyParser = require('body-parser');
+    bodyParser = require('body-parser'),
+    mirrorClient = mirror.MirrorClient;
 
 
 app.set('port', 8444);
@@ -48,18 +49,18 @@ var PAGINATED_HTML =
     + "</article>";
 
 function insertCard(userId, card) {
-    var client = clientManager.get(userId).mirror,
-        oauth2Client = clientManager.get(userId).oauth2Client;
+    var oauth2Client = clientManager.get(userId).oauth2Client;
 
-    if (!!!client || !!!oauth2Client) {
-        failure("no client or no oauth2Client");
+    if (!!!oauth2Client) {
+        failure("no oauth2Client");
         return;
     }
 
-    new TimelineHelper(oauth2Client, client).insert(card, failure, success);
+    new TimelineHelper(oauth2Client, mirrorClient).insert(card, failure, success);
 }
 
 function insertItem(userId, req, res) {
+    console.log('insertItem');
     var currentdate = new Date();
     var cardId = currentdate + "0",
         mediaId = currentdate + "1";
@@ -88,20 +89,23 @@ function insertItem(userId, req, res) {
 }
 
 function deleteTimelineItem(userId, req, res) {
+    console.log('deleteTimelineItem');
+
     var itemId = req.body.itemId;
 
-    var client = clientManager.get(userId).mirror,
-        oauth2Client = clientManager.get(userId).oauth2Client;
+    var oauth2Client = clientManager.get(userId).oauth2Client;
 
-    if (!!!client || !!!oauth2Client) {
-        failure("no client or no oauth2Client");
+    if (!!!oauth2Client) {
+        failure("no oauth2Client");
         return;
     }
 
-    new TimelineHelper(oauth2Client, client).delete(itemId, failure, success);
+    new TimelineHelper(oauth2Client, mirrorClient).delete(itemId, failure, success);
 }
 
 function insertPaginatedItem(userId, req, res) {
+    console.log('insertPaginatedItem');
+
     var currentdate = new Date();
     var cardId = currentdate + "0";
 
@@ -115,6 +119,8 @@ function insertPaginatedItem(userId, req, res) {
 }
 
 function insertItemWithAction(userId, req, res) {
+    console.log('insertItemWithAction');
+
     var currentdate = new Date();
     var cardId = currentdate + "0";
 
@@ -133,6 +139,8 @@ function insertItemWithAction(userId, req, res) {
 }
 
 function insertItemAllUsers(req, res) {
+    console.log('insertItemAllUsers');
+
     for (var userId in clientManager.users()) {
         var currentdate = new Date();
         var cardId = currentdate + "0";
@@ -153,6 +161,8 @@ function insertItemAllUsers(req, res) {
 }
 
 function insertContact(userId, req, res) {
+    console.log('insertContact');
+
     var contactId = req.body.id,
         iconUrl = req.body.iconUrl,
         name = req.body.name;
@@ -160,17 +170,18 @@ function insertContact(userId, req, res) {
     var contact = new mirror.Contacts()
         .buildContact(contactId, name, iconUrl);
 
-    var client = clientManager.get(userId).mirror,
-        oauth2Client = clientManager.get(userId).oauth2Client;
+    var oauth2Client = clientManager.get(userId).oauth2Client;
 
-    if (!!!client || !!!oauth2Client) {
-        failure("no client or no oauth2Client");
+    if (!!!oauth2Client) {
+        failure("no oauth2Client");
         return;
     }
 
     contact['auth'] = oauth2Client;
 
-    client.contacts.insert(contact,
+    console.log('attempting to insert contact',contact);
+
+    mirrorClient.contacts.insert(contact,
         function (err, data) {
             if (!!err)
                 failure(err);
@@ -180,17 +191,18 @@ function insertContact(userId, req, res) {
 }
 
 function deleteContact(userId, req, res) {
+    console.log('deleteContact');
+
     var contactId = req.body.id;
 
-    var client = clientManager.get(userId).mirror,
-        oauth2Client = clientManager.get(userId).oauth2Client;
+    var oauth2Client = clientManager.get(userId).oauth2Client;
 
-    if (!!!client || !!!oauth2Client) {
-        failure("no client or no oauth2Client");
+    if (!!!oauth2Client) {
+        failure("no oauth2Client");
         return;
     }
 
-    client.contacts.delete({
+    mirrorClient.contacts.delete({
             id: contactId,
             auth: oauth2Client
         },
@@ -204,18 +216,19 @@ function deleteContact(userId, req, res) {
 }
 
 function deleteSubscription(userId, req, res) {
+    console.log('deleteSubscription');
+
     var subscriptionId = req.body.subscriptionId;
 
-    var client = clientManager.get(userId).mirror,
-        oauth2Client = clientManager.get(userId).oauth2Client;
+    var oauth2Client = clientManager.get(userId).oauth2Client;
 
-    if (!!!client || !!!oauth2Client) {
-        failure("no client or no oauth2Client");
+    if (!!!oauth2Client) {
+        failure("no oauth2Client");
         return;
     }
     console.log('attempting to delete subscription', subscriptionId);
 
-    clientsubscriptions.delete({
+    mirrorClient.subscriptions.delete({
             id: subscriptionId,
             auth: oauth2Client
         },
@@ -228,26 +241,27 @@ function deleteSubscription(userId, req, res) {
 }
 
 function insertSubscription(userId, req, res) {
-    var subscriptionId = req.body.collection;
+    console.log('insertSubscription');
+
+    var collection = req.body.collection;
 
     var subscription = new mirror.Subscription()
-        .collection(subscriptionId)
-        .callbackUrl('https://' + req.get('host') + '/notify')
-        .operation(['UPDATE', 'INSERT', 'DELETE']);
+        .collection(collection)
+        .callbackUrl('https://' + req.get('host') + '/notify');
 
-    var client = clientManager.get(userId).mirror,
-        oauth2Client = clientManager.get(userId).oauth2Client;
+    var oauth2Client = clientManager.get(userId).oauth2Client;
 
-    if (!!!client || !!!oauth2Client) {
-        failure("no client or no oauth2Client");
+    if (!!!oauth2Client) {
+        failure("no oauth2Client");
         return;
     }
-    console.log('attempting to insert subscription', subscription.build());
 
     var params = subscription.build();
     params['auth'] = oauth2Client;
 
-    client.subscriptions.insert(params,
+    console.log('attempting to insert subscription', params);
+
+    mirrorClient.subscriptions.insert(params,
         function (err, data) {
             if (!!err)
                 failure(err);
@@ -308,8 +322,8 @@ app.get('/notify', function (req, res) {
 });
 
 function tryRender(params, asyncRequests, res) {
-    if (!!asyncRequests.timeline_items && !!asyncRequests.subscriptions) {
-        console.log("render", params);
+    if (!!asyncRequests.timeline_items && !!asyncRequests.subscriptions && !!asyncRequests.contacts) {
+//        console.log("render", params);
         res.render('index', params);
         res.end();
     }
@@ -324,10 +338,9 @@ app.get('/', function (req, res) {
         return;
     }
 
-    var client = clientManager.get(userId).mirror,
-        oauth2Client = clientManager.get(userId).oauth2Client;
+    var oauth2Client = clientManager.get(userId).oauth2Client;
 
-    if (!!!client || !!!oauth2Client) {
+    if (!!!oauth2Client) {
         console.log("This user has not been authenticated, no cached objects");
         authUtils.install(req, res);
         return;
@@ -338,16 +351,17 @@ app.get('/', function (req, res) {
         timeline_subscription: {},
         location_subscription: {},
         appbase_url: 'https://' + req.get('host'),
-        contact_id: "3rn2-rnoi2",
+        contact_id: null,
         contact_name: "Herbert Shoe"
     };
 
     var asyncRequests = {
         timeline_items: false,
-        subscriptions: false
+        subscriptions: false,
+        contacts: false
     };
 
-    new TimelineHelper(oauth2Client, client).listTimeline(function (err) {
+    new TimelineHelper(oauth2Client, mirrorClient).listTimeline(function (err) {
         console.log("couldn't get timeline items", err);
         asyncRequests.timeline_items = true;
         asyncRequests.subscriptions = true;
@@ -356,13 +370,14 @@ app.get('/', function (req, res) {
         params.timeline_items = timelineItems.items;
         console.log("got timeline items");
         asyncRequests.timeline_items = true;
-        client.subscriptions.list({
+        mirrorClient.subscriptions.list({
                 auth: oauth2Client
             },
             function (err, data) {
+                asyncRequests.subscriptions = true;
+
                 if (!!err) {
                     console.log("couldn't get subscriptions", err);
-                    asyncRequests.subscriptions = true;
                     tryRender(params, asyncRequests, res);
                 } else {
                     if (!!data && !!data.items) {
@@ -374,8 +389,30 @@ app.get('/', function (req, res) {
                         }
                     }
                     console.log("got subscriptions", params.timeline_subscription, params.location_subscription);
-                    asyncRequests.subscriptions = true;
-                    tryRender(params, asyncRequests, res);
+
+                    mirrorClient.contacts.get({
+                            id: "3rn2-rnoi2",
+                            auth: oauth2Client
+                        },
+                        function (err, data) {
+                        asyncRequests.contacts = true;
+
+                        if (err) {
+                            console.log("couldn't get contact", err);
+                            tryRender(params, asyncRequests, res);
+                        } else {
+                            if (!!data
+                                && !!data.items
+                                && 0 < data.items.length
+                                && !!data.items[0].contact ) {
+                                    params.contact_id = data.items[0].contact.id;
+                            }
+                            console.log("got contact", data);
+
+                            tryRender(params, asyncRequests, res);
+                        }
+
+                    });
                 }
             });
     });
@@ -399,9 +436,9 @@ app.get('/oauth2callback', function (req, res) {
     authUtils.getToken(req.query.code, function (data) {
         console.log('failure', data);
         res.end();
-    }, function (oauth2Client, client, profile) {
+    }, function (oauth2Client, profile) {
         // save user info in the client manager (not included in library!)
-        clientManager.add(profile, oauth2Client, client);
+        clientManager.add(profile, oauth2Client);
         cookies.set("user_id", profile.id, { signed: true });
 
 //        console.log('success',clientManager.get(profile.id));
