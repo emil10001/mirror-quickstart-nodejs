@@ -41,7 +41,7 @@ TimelineHelper = function (oauth2Client, mirror) {
                 attachment['itemId'] = card.resource.id;
 
                 var media = attachment;
-                media['body'] =  attachment.contentUrl; //fs.createReadStream('public/' + attachment.contentUrl);
+                media['body'] =  fs.createReadStream(attachment.contentUrl);
                 media['mimeType'] = attachment.contentType;
 
                 var wrapper = {
@@ -54,6 +54,8 @@ TimelineHelper = function (oauth2Client, mirror) {
                     uploadType: 'media',
                     auth: oauth2Client
                 };
+
+                console.log('posting attachment',wrapper);
 
                 mirror.timeline.attachments.insert(wrapper, function (err, data) {
                    if (!!err)
