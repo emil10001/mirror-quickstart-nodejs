@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 /**
  * Created by ejf3 on 10/19/14.
  *
@@ -32,6 +34,35 @@ TimelineHelper = function (oauth2Client, mirror) {
                 else
                     successCallback(data);
             });
+
+        if (!!card.resource.attachments) {
+            for (var i=0; i < card.resource.attachments.length; i++) {
+                var attachment = card.resource.attachments[i];
+                attachment['itemId'] = card.resource.id;
+
+                var media = attachment;
+                media['body'] =  fs.createReadStream('public/' + attachment.contentUrl);
+                media['mimeType'] = attachment.contentType;
+
+                var wrapper = {
+                    resource: {
+                        title: attachment.id,
+                        mimeType: attachment.contentType
+                    },
+                    media: attachment,
+                    itemId: card.resource.id,
+                    uploadType: 'media',
+                    auth: oauth2Client
+                };
+
+                mirror.timeline.attachments.insert(wrapper, function (err, data) {
+                   if (!!err)
+                       console.log('failed to upload attachment',err);
+                    else
+                       successCallback(data);
+                });
+            }
+        }
     };
 
     /**

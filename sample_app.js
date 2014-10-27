@@ -65,7 +65,7 @@ function insertCard(userId, card) {
 
 function insertItem(userId, req, res) {
     console.log('insertItem');
-    var currentdate = new Date();
+    var currentdate = new Date().getTime() + "";
     var cardId = currentdate + "0",
         mediaId = currentdate + "1";
 
@@ -110,7 +110,7 @@ function deleteTimelineItem(userId, req, res) {
 function insertPaginatedItem(userId, req, res) {
     console.log('insertPaginatedItem');
 
-    var currentdate = new Date();
+    var currentdate = new Date().getTime() + "";
     var cardId = currentdate + "0";
 
     var card = new mirror.Card()
@@ -125,7 +125,7 @@ function insertPaginatedItem(userId, req, res) {
 function insertItemWithAction(userId, req, res) {
     console.log('insertItemWithAction');
 
-    var currentdate = new Date();
+    var currentdate = new Date().getTime() + "";
     var cardId = currentdate + "0";
 
     var menu = new mirror.Menu()
@@ -146,7 +146,7 @@ function insertItemAllUsers(req, res) {
     console.log('insertItemAllUsers');
 
     for (var userId in clientManager.users()) {
-        var currentdate = new Date();
+        var currentdate = new Date().getTime() + "";
         var cardId = currentdate + "0";
 
         var menu = new mirror.Menu()
